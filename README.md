@@ -2,6 +2,8 @@
 
 This project demonstrates a simple call to the Lilypad Anura API.
 
+The project uses a hardcoded prompt, but could easily be extended to set a custom prompt.
+
 ### Usage
 
 Visit https://anura.lilypad.tech/ to request an API key.
