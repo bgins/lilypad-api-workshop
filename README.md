@@ -21,3 +21,7 @@ Run a job:
 ```
 go run .
 ```
+
+### Credits
+
+Most of this code was written by Claude 3.7 Sonnet. I haven't looked it over that closely, so take it with a grain of salt.
