@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// CompleteChat makes a request to the AI service and returns the generated response
+// CompleteChat makes a request to Anura and returns the generated response
 func CompleteChat(apiKey, model string, messages []Message) (string, error) {
 	// Create the request payload
 	jsonData, err := createCompletionRequest(model, messages)

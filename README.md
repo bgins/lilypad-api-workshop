@@ -2,27 +2,21 @@
 
 This project demonstrates a simple call to the Lilypad Anura API.
 
-The project uses a hardcoded prompt, but could easily be extended to set a custom prompt.
-
 ### Usage
 
-Visit https://anura.lilypad.tech/ to request an API key.
-
-Set your API key and the model you would like to run as environment variables.
-
+Visit https://anura.lilypad.tech/ to request an API key. Set your API key as an environment variable.
 
 ```bash
-# Use a specific model
-export ANURA_MODEL="gpt-4"
 export ANURA_API_KEY="<your-api-key>"
 ```
 
-We default to `qwen2.5:7b`. See the Anura docs to see what other models are available: https://docs.lilypad.tech/lilypad/developer-resources/inference-api#get-available-models.
+Start the chat client.
 
-Run a job:
 ```
 go run .
 ```
+
+You will be asked which model you would like to use, then you can start chatting.
 
 ### Credits
 

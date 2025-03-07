@@ -10,6 +10,18 @@ import (
 	"strings"
 )
 
+// ModelsData contains the models array
+type ModelsData struct {
+	Models []string `json:"models"`
+}
+
+// ListModelsResponse represents the response from the models endpoint
+type ListModelsResponse struct {
+	Data    ModelsData `json:"data"`
+	Message string     `json:"message"`
+	Status  int        `json:"status"`
+}
+
 // Message represents a single message in a conversation
 type Message struct {
 	Role    string `json:"role"`
@@ -70,8 +82,6 @@ func processStreamResponse(body io.Reader) (string, error) {
 
 		// Handle event lines
 		if strings.HasPrefix(line, "event:") {
-			eventType := strings.TrimSpace(strings.TrimPrefix(line, "event:"))
-			fmt.Printf("Event detected: %s\n", eventType)
 			continue
 		}
 
@@ -82,8 +92,6 @@ func processStreamResponse(body io.Reader) (string, error) {
 			// Try to parse as JSON
 			var chunk ResponseChunk
 			if err := json.Unmarshal([]byte(dataContent), &chunk); err != nil {
-				// Not parseable as JSON - might be job_id or other metadata
-				fmt.Printf("Metadata: %s\n", dataContent)
 				if jobID == "" {
 					jobID = dataContent // Assume first non-JSON data is job ID
 				}
@@ -109,8 +117,50 @@ func processStreamResponse(body io.Reader) (string, error) {
 	}
 
 	if jobID != "" {
-		fmt.Printf("Job ID: %s\n", jobID)
+		fmt.Printf("[Job ID: %s]\n", jobID)
 	}
 
 	return fullContent.String(), nil
+}
+
+// ListAvailableModels fetches the list of available models from the API
+func ListAvailableModels(apiKey string) ([]string, error) {
+	url := "https://anura-testnet.lilypad.tech/api/v1/models"
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %v", err)
+	}
+
+	// Set headers
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	// Send the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check response status
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("received status code %d: %s", resp.StatusCode, string(body))
+	}
+
+	// Parse the response
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading response: %v", err)
+	}
+
+	var modelsResp ListModelsResponse
+	if err := json.Unmarshal(body, &modelsResp); err != nil {
+		return nil, fmt.Errorf("error parsing response: %v", err)
+	}
+
+	// Return the list of models
+	return modelsResp.Data.Models, nil
 }
